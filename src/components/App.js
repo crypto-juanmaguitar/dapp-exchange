@@ -3,7 +3,6 @@ import './App.css';
 import Web3 from 'web3'
 import Token from '../abis/Token.json'
 
-console.log(Token)
 class App extends Component {
   componentWillMount() {
     this.loadBlockchainData()
@@ -12,10 +11,17 @@ class App extends Component {
   async loadBlockchainData() {
     const web3 = new Web3(window.ethereum)
     const networkId = await web3.eth.net.getId()
-    const accounts = await web3.eth.getAccounts()
-    // const token = new web3.eth.Contract(Token.abi, Token.networks[networkId].address)
-    // const totalSupply = await token.methods.totalSupply().call()
-    // console.log("totalSupply", totalSupply)
+    // await window.ethereum.enable();
+    // const accounts = await web3.eth.getAccounts()
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+    console.log({networkId, accounts})
+    const tokenAbi = Token.abi
+    const tokenAddress = Token.networks[networkId].address
+    console.log({tokenAbi, tokenAddress})
+    const token = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const totalSupply = await token.methods.totalSupply().call()
+    console.log("totalSupply", totalSupply)
   }
 
   render() {
