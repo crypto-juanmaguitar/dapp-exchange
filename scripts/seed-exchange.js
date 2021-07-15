@@ -19,7 +19,7 @@ const wait = (seconds) => {
 module.exports = async function(callback) {
   try {
     // Fetch accounts from wallet - these are unlocked
-    const accounts = await web3.eth.getAccounts()
+    const accounts = await web3.eth.getAccounts() 
 
     // Fetch the deployed token
     const token = await Token.deployed()
@@ -30,15 +30,15 @@ module.exports = async function(callback) {
     console.log('Exchange fetched', exchange.address)
 
     // Give tokens to account[1]
-    const sender = accounts[0]
+    const sender = accounts[0] // deployer
     const receiver = accounts[1]
-    let amount = web3.utils.toWei('10000', 'ether') // 10,000 tokens
+    let amount = web3.utils.toWei('10000', 'ether') // 10,000 tokens → 10000 * 10 > 18
 
     await token.transfer(receiver, amount, { from: sender })
     console.log(`Transferred ${amount} tokens from ${sender} to ${receiver}`)
 
     // Set up exchange users
-    const user1 = accounts[0]
+    const user1 = accounts[0] // deployer
     const user2 = accounts[1]
 
     // User 1 Deposits Ether
