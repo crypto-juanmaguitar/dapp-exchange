@@ -6,7 +6,9 @@ import {
   exchangeLoaded,
   cancelledOrdersLoaded,
   filledOrdersLoaded,
-  allOrdersLoaded
+  allOrdersLoaded,
+  orderCancelling,
+  orderCancelled
 } from './actions'
 import Token from '../abis/Token.json'
 import Exchange from '../abis/Exchange.json'
@@ -56,11 +58,7 @@ export const loadExchange = async (web3, networkId, dispatch) => {
   }
 }
 
-
-
 export const loadAllOrders = async (exchange, dispatch) => {
-  // getPastEvents → https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#getpastevents
-  
   // Fetch cancelled orders with the "Cancel" event stream
   const cancelStream = await exchange.getPastEvents('Cancel', { fromBlock: 0, toBlock: 'latest' })
   // Format cancelled orders
@@ -82,6 +80,43 @@ export const loadAllOrders = async (exchange, dispatch) => {
   // Add open orders to the redux store
   dispatch(allOrdersLoaded(allOrders))
 }
+
+export const cancelOrder = (dispatch, exchange, order, account) => {
+  exchange.methods.cancelOrder(order.id).send({ from: account })
+  .on('transactionHash', (hash) => {
+     dispatch(orderCancelling())
+  })
+  .on('error', (error) => {
+    console.log(error)
+    window.alert('There was an error!')
+  })
+}
+
+export const subscribeToEvents = async (exchange, dispatch) => {
+  exchange.events.Cancel({}, (error, event) => {
+    dispatch(orderCancelled(event.returnValues))
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
